@@ -1,0 +1,79 @@
+<% if @host.is_vmware_snapshots_enabled? %>
+<% javascript 'vmware_host_snapshots' %>
+<% content_for :stylesheets do %>
+<style>
+  .table-striped > tbody > tr.current-snapshot > td {
+    background-color: #C8E3F4 !important;
+  }
+  .modal-lg{
+      width: 850px;      
+  }
+  .modal-lg .modal-body {
+    max-height: none;
+    height: auto;
+  }
+  
+</style>
+<% end %>
+
+<div id="vmware_host_snapshots_popup" class="modal fade">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Manage Host Snapshots for <%= @host %></h4>
+      </div>
+      <div class="modal-body">
+
+
+
+        <ul class="nav nav-tabs" data-tabs="tabs">
+          <li class="active"><a href="#snapshots" data-toggle="tab" onclick="load_host_snapshots()"><%= _("Snapshots") %></a></li>
+          <li><a href="#add_new_snapshot" data-toggle="tab"><%= _("Take Snapshot") %></a></li>
+
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="snapshots">
+            <p id="spinner">
+              <%= image_tag '/assets/spinner.gif' %>
+              <%= _('Loading snapshots information ...') %>
+            </p>
+          </div>
+          <div id="add_new_snapshot" class="tab-pane">
+            <div id="add_snapshot_status"></div>
+            <%= form_tag api_host_vmware_snapshots_path(@host), {:data => {:id => "add_vmware_snapshot", :submit => 'vmware_snapshot_form'}, :onsubmit => "submit_vmware_snapshot();return false;"} do  %>
+              <div class="clearfix">
+                <%= label_tag(_("Name")) %>
+                <div class="input">
+                  <%#= text_field_tag(:name) %>
+                  <%= text_field_tag :snapshot_name, "", {:class=>"form-control", :focus_on_load => true} %>
+                </div>
+              </div>
+              <div class="clearfix">
+                <%= label_tag(_("Description")) %>
+                <div class="input">
+                  <%#= text_field_tag(:description) %>
+                  <%= text_area_tag :snapshot_description, "", {:class=>"form-control"} %>
+                </div>
+              </div>
+              <div class="form-actions">
+              <%= submit_tag _('Take'), :class => "btn btn-success", :id => "take_snapshot_btn", :'data-loading-text' => "Taking..." %>
+              </div>
+
+            <% end %>
+          </div>
+            
+          
+          </div>
+
+
+
+
+        </div>
+
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+
+<% end %>

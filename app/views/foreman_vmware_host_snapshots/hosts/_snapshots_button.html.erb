@@ -1,0 +1,3 @@
+<% if @host.is_vmware_snapshots_enabled? %>
+<a title='' id="host_snapshots_btn" data-id='aid_host_snapshots' data-url='<%= host_vmware_snapshots_path(@host) %>' class='btn btn-default' onclick='load_host_snapshots_popup()' data-original-title='Snapshots'>Snapshots</a>
+<% end %>

@@ -1,0 +1,51 @@
+<% if !@snapshots.empty? %>
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th><%= _("Name") %></th>
+      <th><%= _("Description") %></th>        
+      <th><%= _("Power state") %></th>
+      <th><%= _("Creation Time") %></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% for snapshot in @snapshots %>
+    
+    <tr id="<%= snapshot[:ref] %>" <%= snapshot[:current_snapshot] ? 'class=current-snapshot rel=twipsy data-original-title=Host&nbsp&nbsp;is&nbsp;running&nbsp;here'.html_safe : ""  %>  delete-snapshot-url="<%= api_host_vmware_snapshot_path(@host, snapshot[:ref]) %>" revert-snapshot-url="<%= revert_api_host_vmware_snapshot_path(@host, snapshot[:ref]) %>">
+      
+        <td><%= snapshot[:current_snapshot] ? "<span class='glyphicon glyphicon-record'></span> ".html_safe : "" %> <%= snapshot[:name] %></td>
+        <td><%= snapshot[:description] %></td>
+        
+        <td>
+          <span <%= snapshot_power_class(snapshot[:power_state]) %>>
+            <%= snapshot_state(snapshot[:power_state]) %></span>
+          </td>
+          <td>
+            <span rel="twipsy" data-original-title="<%= snapshot[:create_time].to_time.strftime("%B %d, %Y %H:%M") %>">
+              <%= time_ago_in_words(snapshot[:create_time]) %>
+            </span>
+          </td>
+          <td>
+            <div class=''>
+            <div class='col-md-5'>
+            <%= action_buttons(
+              link_to_function(_('Actions'), "return false" ),
+              display_link_if_authorized(_("Revert"), {:auth_object => @host, :authorizer => authorizer},{:confirm => _("Current state of the virtual machine will be lost unless it is saved in a snapshot. Revert to snapshot '%s'?") % snapshot[:name], :href => "javascript: revert_snapshot('#{snapshot[:ref]}')"}),
+              display_delete_if_authorized({:auth_object => @host, :authorizer => authorizer},{:confirm => _("Delete '%s' snapshot?") % snapshot[:name], :href => "javascript: delete_snapshot('#{snapshot[:ref]}')"}))%>
+              </div>
+              <div class='col-md-1'>
+              <div id="<%= snapshot[:ref] %>-spinner" style="display: none;"> <%= image_tag '/assets/spinner.gif' %></div>
+              </div>
+              </div>
+            </td>
+          </tr>
+
+          <% end %>
+
+        </tbody>
+      </table>
+      <% else %>
+        <div class="text-danger">No Snapshots taken</div>
+      <% end %>
